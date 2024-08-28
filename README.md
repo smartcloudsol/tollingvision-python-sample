@@ -1,4 +1,4 @@
-# JavPython Example Program for Tolling Vision
+# Python Example Program for Tolling Vision
 
 This repository contains a sample Python application that demonstrates how to use [Tolling Vision](https://tollingvision.com). Tolling Vision is a Dockerized service for tolling companies utilizing AI-based recognition engines. It extracts ANPR/ALPR (Automatic Number Plate Recognition), MMR (Make and Model Recognition), and ADR (Dangerous Goods Signs Recognition) information from images and image sequences.
 
