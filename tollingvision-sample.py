@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import csv
+import os
 from concurrent import futures
 from tollingvision_scsinfo import TollingVisionServiceStub, EventRequest, SearchRequest, Image
 
@@ -54,7 +55,7 @@ def create_event_request(files, front_regex, rear_regex, overview_regex):
     return EventRequest(front_request=front_requests, rear_request=rear_requests, overview_request=overview_requests)
 
 def format_plate(plate):
-    return f"{plate.text} {plate.country} {plate.state} {plate.category} ({plate.confidence})"
+    return f"{plate.text} {plate.country} {plate.state} {plate.category} {plate.confidence}% (text: {plate.text_confidence}%|state: {plate.plate_type_confidence}%)"
 
 def format_mmr(mmr):
     return f"{mmr.make} {mmr.model} ({mmr.category} {mmr.view_point} {mmr.color})"
@@ -75,7 +76,9 @@ def main():
     overview_regex = sys.argv[9]
 
     if secured:
-        channel = grpc.secure_channel(service_url, grpc.ssl_channel_credentials())
+        #os.environ["GRPC_DEFAULT_SSL_ROOTS_FILE_PATH"] = "/etc/ssl/certs/ca-certificates.crt"
+        channel_credentials = grpc.ssl_channel_credentials()
+        channel = grpc.secure_channel(service_url, channel_credentials)
     else:
         channel = grpc.insecure_channel(service_url)
     
