@@ -5,7 +5,7 @@ import sys
 import csv
 import os
 from concurrent import futures
-from tollingvision_scsinfo import TollingVisionServiceStub, EventRequest, SearchRequest, Image
+from tollingvision_scsinfo import TollingVisionServiceStub, EventRequest, Image
 
 def list_files_recursively(folder):
     file_list = []
@@ -28,9 +28,9 @@ def group_images(files, group_regex):
     return groups
 
 def create_event_request(files, front_regex, rear_regex, overview_regex):
-    front_requests = []
-    rear_requests = []
-    overview_requests = []
+    front_images = []
+    rear_images = []
+    overview_images = []
     front_pattern = re.compile(front_regex)
     rear_pattern = re.compile(rear_regex)
     overview_pattern = re.compile(overview_regex)
@@ -39,20 +39,19 @@ def create_event_request(files, front_regex, rear_regex, overview_regex):
         with open(file, 'rb') as f:
             image_data = f.read()
         
-        search_request = SearchRequest(image=Image(data=image_data))
+        image = Image(data=image_data)
 
         if overview_pattern.match(os.path.basename(file)):
-            search_request.make_and_model_recognition = True
-            overview_requests.append(search_request)
+            overview_images.append(image)
         elif front_pattern.match(os.path.basename(file)):
-            front_requests.append(search_request)
+            front_images.append(image)
         elif rear_pattern.match(os.path.basename(file)):
-            rear_requests.append(search_request)
+            rear_images.append(image)
     
-    if not front_requests and not rear_requests and not overview_requests:
+    if not front_images and not rear_images and not overview_images:
         return None
     
-    return EventRequest(front_request=front_requests, rear_request=rear_requests, overview_request=overview_requests)
+    return EventRequest(front_image=front_images, rear_image=rear_images, overview_image=overview_images)
 
 def format_plate(plate):
     return f"{plate.text} {plate.country} {plate.state} {plate.category} {plate.confidence}% (text: {plate.text_confidence}%|state: {plate.plate_type_confidence}%)"
